@@ -23,6 +23,8 @@ applingMiddle.displayName = "Appling County Middle School";
  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
+
+var badgePk = null;
 $(document).ready(function () {
     $("#ident option").each(function () {
         var identity = new EcContact();
@@ -37,6 +39,9 @@ $(document).ready(function () {
         EcIdentityManager.addIdentity(identity);
     });
     refreshAssertions();
+    EcRemote.getExpectingString(repo.selectedServer, "badge/pk", function (pk) {
+        badgePk = EcPk.fromPem(pk);
+    }, console.log);
 });
 
 refreshAssertions = function () {
@@ -156,6 +161,7 @@ gotoDetail = function (assertion, competency) {
                 for (var i = 0; i < assertion.getEvidenceCount(); i++)
                     evidences.push(assertion.getEvidence(i));
                 a.setEvidence(evidences);
+                a.addReader(badgePk);
                 $(this).parent().hide({});
                 EcRepository.save(a, function () {
                     EcRepository._delete(assertion);
